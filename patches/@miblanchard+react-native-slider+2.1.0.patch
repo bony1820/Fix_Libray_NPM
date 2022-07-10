@@ -1,5 +1,5 @@
 diff --git a/node_modules/@miblanchard/react-native-slider/lib/index.js b/node_modules/@miblanchard/react-native-slider/lib/index.js
-index 074bd84..130867d 100644
+index 074bd84..0366dcc 100644
 --- a/node_modules/@miblanchard/react-native-slider/lib/index.js
 +++ b/node_modules/@miblanchard/react-native-slider/lib/index.js
 @@ -98,6 +98,10 @@ export class Slider extends PureComponent {
@@ -51,7 +51,7 @@ index 074bd84..130867d 100644
      render() {
 -        const { containerStyle, debugTouchArea, maximumTrackTintColor, maximumValue, minimumTrackTintColor, minimumValue, renderAboveThumbComponent, renderTrackMarkComponent, renderThumbComponent, thumbStyle, thumbTintColor, trackStyle, vertical, ...other } = this.props;
 -        const { allMeasured, containerSize, thumbSize, trackMarksValues, values, } = this.state;
-+        const { containerStyle, debugTouchArea, maximumTrackTintColor, maximumValue, minimumTrackTintColor, minimumValue, renderAboveThumbComponent, renderTrackMarkComponent, renderTrackMarkComponentActive, renderThumbComponent, thumbStyle, thumbTintColor, trackStyle, vertical, ...other } = this.props;
++        const { containerStyle, colorBelowThumbComponent, colorBelowThumbComponentActive, debugTouchArea, maximumTrackTintColor, maximumValue, minimumTrackTintColor, minimumValue, renderAboveThumbComponent, renderBelowThumbComponent, renderTrackMarkComponent, renderTrackMarkComponentActive, renderThumbComponent, thumbStyle, thumbTintColor, trackStyle, vertical, ...other } = this.props;
 +        const { allMeasured, containerSize, thumbSize, trackMarksValues, values, trackMarkSize } = this.state;
          const interpolatedThumbValues = values.map((value) => value.interpolate({
              inputRange: [minimumValue, maximumValue],
@@ -96,3 +96,66 @@ index 074bd84..130867d 100644
                  interpolatedThumbValues.map((value, i) => (React.createElement(Animated.View, { key: `slider-thumb-${i}`, style: [
                          renderThumbComponent
                              ? styles.renderThumbComponent
+@@ -500,7 +529,29 @@ export class Slider extends PureComponent {
+                     ? renderThumbComponent()
+                     : this._renderThumbImage(i)))),
+                 React.createElement(View, { style: [styles.touchArea, touchOverflowStyle], ...this._panResponder.panHandlers }, !!debugTouchArea &&
+-                    interpolatedThumbValues.map((value, i) => this._renderDebugThumbTouchRect(value, i))))));
++                    interpolatedThumbValues.map((value, i) => this._renderDebugThumbTouchRect(value, i))),
++                renderBelowThumbComponent &&
++                    interpolatedTrackMarksValues &&
++                    interpolatedTrackMarksValues.map((value, i) => (React.createElement(Animated.Text, { key: `track-mark-${i}`, style: [
++                            styles.belowThumbComponentsContainer,
++                            {
++                                transform: [
++                                    {
++                                        translateX: value,
++                                    },
++                                    {
++                                        translateY: 0,
++                                    },
++                                ],
++                                color: this.state.values[0].interpolate({
++                                    inputRange: [i -1, i],
++                                    outputRange: [colorBelowThumbComponent, colorBelowThumbComponentActive]
++                                }),
++
++                                ...valueVisibleStyle,
++                            },
++                        ] }, renderBelowThumbComponent(i))))
++                    )));
+     }
+ }
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/node_modules/@miblanchard/react-native-slider/lib/styles.js b/node_modules/@miblanchard/react-native-slider/lib/styles.js
+index 8360a65..3c62d5b 100644
+--- a/node_modules/@miblanchard/react-native-slider/lib/styles.js
++++ b/node_modules/@miblanchard/react-native-slider/lib/styles.js
+@@ -6,6 +6,11 @@ export const defaultStyles = {
+     aboveThumbComponentsContainer: {
+         flexDirection: 'row',
+     },
++    belowThumbComponentsContainer: {
++        position: 'absolute',
++        left: 0,
++        bottom: -20
++    },
+     container: {
+         height: 40,
+         justifyContent: 'center',
+diff --git a/node_modules/@miblanchard/react-native-slider/lib/types.d.ts b/node_modules/@miblanchard/react-native-slider/lib/types.d.ts
+index 2426bbd..f666083 100644
+--- a/node_modules/@miblanchard/react-native-slider/lib/types.d.ts
++++ b/node_modules/@miblanchard/react-native-slider/lib/types.d.ts
+@@ -28,6 +28,10 @@ export declare type SliderProps = {
+     renderAboveThumbComponent?: (index: number) => React.ReactNode;
+     renderThumbComponent?: () => React.ReactNode;
+     renderTrackMarkComponent?: (index: number) => React.ReactNode;
++    renderTrackMarkComponentActive?: (index: number) => React.ReactNode;
++    renderBelowThumbComponent?: (index: number) => React.ReactNode;
++    colorBelowThumbComponent?: string;
++    colorBelowThumbComponentActive?: string;
+     step?: number;
+     thumbImage?: ImageSourcePropType;
+     thumbStyle?: ViewStyle;

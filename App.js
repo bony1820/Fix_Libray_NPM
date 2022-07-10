@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Dimensions, View } from 'react-native';
+import { Animated, Dimensions, View, Text } from 'react-native';
 import {
   GestureHandlerRootView,
   PanGestureHandler,
@@ -37,6 +37,12 @@ export default function App() {
         onValueChange={(value) => {
           // setState(value)
         }}
+        renderBelowThumbComponent={() => <Text style={{ fontSize: 12 }}>B</Text>}
+        colorBelowThumbComponent={'#f00'}
+        colorBelowThumbComponentActive={'#0f0'}
+        minimumTrackTintColor={'#0f0'}
+        maximumTrackTintColor={'#f00'}
+        thumbTintColor={'#0f0'}
         />
 
     </View>
